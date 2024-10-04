@@ -40,8 +40,11 @@ export async function Update<T extends ra.RaRecord>(
           currentUnitCost: data.totalCost / data.quantity,
         };
         //delete
+        console.log(docObjTransformed, 'before delete');
         delete docObjTransformed.previousTotalCost;
         delete docObjTransformed.previousQuantity;
+        console.log(docObjTransformed, 'after delete');
+
         break;
       case 'sales':
         productData = {
@@ -69,6 +72,7 @@ export async function Update<T extends ra.RaRecord>(
     }
 
     batch.update(doc(db, `products`, data.productId), productData);
+    console.log(docObjTransformed, "before update")
     batch.update(doc(r.collection, id), docObjTransformed);
     await batch.commit();
 
