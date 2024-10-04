@@ -1,4 +1,10 @@
-import { doc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  getFirestore,
+  increment,
+  updateDoc,
+  writeBatch,
+} from 'firebase/firestore';
 import { log } from '../../misc';
 import * as ra from '../../misc/react-admin-models';
 import { FireClient } from '../database';
@@ -19,6 +25,50 @@ export async function Update<T extends ra.RaRecord>(
   client.checkRemoveIdField(docObj, id);
   await client.addUpdatedByFields(docObj);
   const docObjTransformed = client.transformToDb(resourceName, docObj, id);
+
+  if (params.meta.custom) {
+    let db = getFirestore();
+    const batch = writeBatch(db);
+    let productData = {};
+    switch (params.meta.custom.page) {
+      case 'purchases':
+        productData = {
+          totalCost: increment(-(+data.previousCost - +data.totalCost)),
+          totalQuantityPurchased: increment(
+            -(+data.previousQuantity - +data.quantity)
+          ),
+          currentUnitCost: data.totalCost / data.quantity,
+        };
+        break;
+      case 'sales':
+        productData = {
+          totalPrice: increment(-(+data.previousPrice - +data.totalPrice)),
+          totalQuantitySold: increment(
+            -(data.previousQuantity - +data.quantity)
+          ),
+        };
+      case 'stockCheck':
+        productData = {
+          totalQuantityOffset: increment(
+            -(+data.previousQuantityOffset - +data.quantityOffset)
+          ),
+        };
+        break;
+
+      default:
+        break;
+    }
+    batch.update(doc(db, `products`, data.productId), productData);
+    batch.update(doc(r.collection, id), docObjTransformed);
+    await batch.commit();
+
+    return {
+      data: {
+        ...docObjTransformed,
+        id: id,
+      },
+    };
+  }
   await updateDoc(doc(r.collection, id), docObjTransformed);
   return {
     data: {

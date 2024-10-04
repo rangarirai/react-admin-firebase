@@ -1,4 +1,11 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  increment,
+  setDoc,
+  writeBatch,
+} from 'firebase/firestore';
 import { log } from '../../misc';
 import * as ra from '../../misc/react-admin-models';
 import { FireClient } from '../database/FireClient';
@@ -57,11 +64,37 @@ export async function Create<T extends ra.RaRecord>(
   await client.addCreatedByFields(docObj);
   await client.addUpdatedByFields(docObj);
   const docObjTransformed = client.transformToDb(resourceName, docObj, newId);
-  alert("hi2")
-  console.log(params, "rraa")
-  if (params.meta) {
-    alert('hi2');
-    console.log(params);
+
+  if (params.meta.custom) {
+    let db = getFirestore();
+    const batch = writeBatch(db);
+    let productData = {};
+    switch (params.meta.custom.page) {
+      case 'purchases':
+        productData = {
+          totalCost: increment(+data.totalCost),
+          totalQuantityPurchased: increment(+data.quantity),
+          currentUnitCost: data.totalCost / data.quantity,
+        };
+        break;
+      case 'sales':
+        productData = {
+          totalPrice: increment(+data.totalPrice),
+          totalQuantitySold: increment(+data.quantity),
+        };
+      case 'stockCheck':
+        productData = {
+          totalQuantityOffset: increment(+data.quantityOffset),
+        };
+        break;
+
+      default:
+        break;
+    }
+    batch.update(doc(db, `products`, data.productId), productData);
+    batch.set(doc(r.collection, newId), docObjTransformed);
+    await batch.commit();
+
     return {
       data: {
         ...docObjTransformed,
