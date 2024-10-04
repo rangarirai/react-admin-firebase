@@ -65,7 +65,7 @@ export async function Create<T extends ra.RaRecord>(
   await client.addUpdatedByFields(docObj);
   const docObjTransformed = client.transformToDb(resourceName, docObj, newId);
 
-  if (params.meta.custom) {
+  if (params?.meta?.custom) {
     let db = getFirestore();
     const batch = writeBatch(db);
     let productData = {};

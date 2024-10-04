@@ -26,14 +26,14 @@ export async function Update<T extends ra.RaRecord>(
   await client.addUpdatedByFields(docObj);
   const docObjTransformed = client.transformToDb(resourceName, docObj, id);
 
-  if (params.meta.custom) {
+  if (params?.meta?.custom) {
     let db = getFirestore();
     const batch = writeBatch(db);
     let productData = {};
     switch (params.meta.custom.page) {
       case 'purchases':
         productData = {
-          totalCost: increment(-(+data.previousCost - +data.totalCost)),
+          totalCost: increment(-(+data.previousTotalCost - +data.totalCost)),
           totalQuantityPurchased: increment(
             -(+data.previousQuantity - +data.quantity)
           ),
@@ -42,7 +42,7 @@ export async function Update<T extends ra.RaRecord>(
         break;
       case 'sales':
         productData = {
-          totalPrice: increment(-(+data.previousPrice - +data.totalPrice)),
+          totalPrice: increment(-(+data.previousTotalPrice - +data.totalPrice)),
           totalQuantitySold: increment(
             -(data.previousQuantity - +data.quantity)
           ),
