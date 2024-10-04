@@ -57,7 +57,7 @@ export async function Create<T extends ra.RaRecord>(
   await client.addCreatedByFields(docObj);
   await client.addUpdatedByFields(docObj);
   const docObjTransformed = client.transformToDb(resourceName, docObj, newId);
-  alert("hi")
+  alert("hi2")
   console.log(params, "rraa")
   if (params.meta) {
     alert('hi');
