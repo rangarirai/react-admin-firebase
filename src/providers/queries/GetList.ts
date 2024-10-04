@@ -8,7 +8,7 @@ import * as ra from '../../misc/react-admin-models';
 import { FireClient } from '../database/FireClient';
 import { FirebaseLazyLoadingClient } from '../lazy-loading/FirebaseLazyLoadingClient';
 
-export async function GetList<T extends ra.Record>(
+export async function GetList<T extends ra.RaRecord>(
   resourceName: string,
   params: ra.GetListParams,
   client: FireClient
@@ -41,8 +41,10 @@ export async function GetList<T extends ra.Record>(
     softDeleted = data.filter((doc) => !doc.deleted);
   }
   const filteredData = filterArray(softDeleted, filterSafe);
-  const pageStart = (params.pagination.page - 1) * params.pagination.perPage;
-  const pageEnd = pageStart + params.pagination.perPage;
+  let page = params?.pagination?.page || 0;
+  let perPage = params?.pagination?.perPage || 1;
+  const pageStart = (page - 1) * perPage;
+  const pageEnd = pageStart + perPage;
   const dataPage = filteredData.slice(pageStart, pageEnd) as T[];
   const total = filteredData.length;
 

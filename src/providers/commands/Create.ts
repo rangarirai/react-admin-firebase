@@ -3,7 +3,7 @@ import { log } from '../../misc';
 import * as ra from '../../misc/react-admin-models';
 import { FireClient } from '../database/FireClient';
 
-export async function Create<T extends ra.Record>(
+export async function Create<T extends ra.RaRecord>(
   resourceName: string,
   params: ra.CreateParams,
   client: FireClient
@@ -57,6 +57,18 @@ export async function Create<T extends ra.Record>(
   await client.addCreatedByFields(docObj);
   await client.addUpdatedByFields(docObj);
   const docObjTransformed = client.transformToDb(resourceName, docObj, newId);
+  alert("hi")
+  console.log(params, "rraa")
+  if (params.meta) {
+    alert('hi');
+    console.log(params);
+    return {
+      data: {
+        ...docObjTransformed,
+        id: newId,
+      },
+    };
+  }
   await setDoc(doc(r.collection, newId), docObjTransformed, { merge: false });
   return {
     data: {

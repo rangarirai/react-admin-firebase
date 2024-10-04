@@ -16,9 +16,9 @@ import { IFirestoreLogger, messageTypes } from '../../misc';
 import { findLastQueryCursor, getQueryCursor } from './queryCursors';
 
 interface ParamsToQueryOptions {
-  filters?: boolean;
-  sort?: boolean;
-  pagination?: boolean;
+  filters: boolean;
+  sort: boolean;
+  pagination: boolean;
 }
 
 interface QueryPair {
@@ -45,7 +45,8 @@ export async function paramsToQuery<
     ? getFiltersConstraints(params.filter)
     : [];
 
-  const sortConstraints = options.sort ? getSortConstraints(params.sort) : [];
+  const sortConstraints =
+    options.sort && params?.sort ? getSortConstraints(params.sort) : [];
 
   const paginationConstraints = options.pagination
     ? await getPaginationConstraints(
@@ -107,7 +108,8 @@ async function getPaginationConstraints<
   resourceName: string,
   flogger: IFirestoreLogger
 ): Promise<QueryConstraint[]> {
-  const { page, perPage } = params.pagination;
+  const page = params.pagination?.page || 1;
+  const perPage = params.pagination?.perPage || 1;
 
   if (page === 1) {
     return [limit(perPage)];
@@ -152,7 +154,7 @@ export function getNextPageParams<TParams extends messageTypes.IParamsGetList>(
     ...params,
     pagination: {
       ...params.pagination,
-      page: params.pagination.page + 1,
+      page: (params?.pagination?.page || 0) + 1,
     },
   };
 }

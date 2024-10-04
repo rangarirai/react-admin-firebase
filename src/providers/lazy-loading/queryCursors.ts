@@ -72,7 +72,8 @@ export async function findLastQueryCursor(
   resourceName: string,
   flogger: IFirestoreLogger
 ) {
-  const { page, perPage } = params.pagination;
+  const page = params.pagination?.page || 1;
+  const perPage = params.pagination?.perPage || 1;
 
   let lastQueryCursor: FireStoreDocumentSnapshot | false = false;
   let currentPage = page - 1;
@@ -80,7 +81,8 @@ export async function findLastQueryCursor(
   const currentPageParams = {
     ...params,
     pagination: {
-      ...params.pagination,
+      page,
+      perPage,
     },
   };
   while (!lastQueryCursor && currentPage > 1) {

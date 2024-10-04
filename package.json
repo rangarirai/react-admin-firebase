@@ -29,7 +29,7 @@
     "microbundle": "^0.15.0",
     "prettier": "^2.8.3",
     "prettier-plugin-organize-imports": "^3.2.2",
-    "ra-core": "3.10.0",
+    "ra-core": "^5.2.2",
     "ts-jest": "^25",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
@@ -39,7 +39,7 @@
   "email": "hello@benwinding.com",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && microbundle",
+    "build": "del /f /s /q dist && microbundle",
     "tsc-test": "tsc -p ./tsconfig.spec.json",
     "watch": "microbundle watch",
     "start-demo": "gulp start-demo",

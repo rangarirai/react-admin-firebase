@@ -22,7 +22,7 @@ export class FirebaseLazyLoadingClient {
     private client: FireClient
   ) {}
 
-  public async apiGetList<T extends ra.Record>(
+  public async apiGetList<T extends ra.RaRecord>(
     resourceName: string,
     reactAdminParams: ra.GetListParams
   ): Promise<ra.GetListResult<T>> {
