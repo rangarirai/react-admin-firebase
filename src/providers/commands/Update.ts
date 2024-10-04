@@ -39,6 +39,9 @@ export async function Update<T extends ra.RaRecord>(
           ),
           currentUnitCost: data.totalCost / data.quantity,
         };
+        //delete
+        delete docObjTransformed.previousTotalCost;
+        delete docObjTransformed.previousQuantity;
         break;
       case 'sales':
         productData = {
@@ -47,17 +50,24 @@ export async function Update<T extends ra.RaRecord>(
             -(data.previousQuantity - +data.quantity)
           ),
         };
+        //delete
+        delete docObjTransformed.previousTotalPrice;
+        delete docObjTransformed.previousQuantity;
+        break;
       case 'stockCheck':
         productData = {
           totalQuantityOffset: increment(
             -(+data.previousQuantityOffset - +data.quantityOffset)
           ),
         };
+        //delete
+        delete docObjTransformed.previousQuantityOffset;
         break;
 
       default:
         break;
     }
+
     batch.update(doc(db, `products`, data.productId), productData);
     batch.update(doc(r.collection, id), docObjTransformed);
     await batch.commit();
